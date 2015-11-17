@@ -1,2 +1,2 @@
 # opennms-wiki
-Additional content for some wiki pages in order to place raw images
+Additional content for some wiki pages in order to place raw files (e.g. images).

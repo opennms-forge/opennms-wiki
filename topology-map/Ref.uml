@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.opennms.features.topology.api.topo.Ref</OriginalElement>
+  <nodes>
+    <node x="989.0" y="455.0">org.opennms.features.topology.plugins.topo.application.ApplicationVertex</node>
+    <node x="2107.375" y="257.0">org.opennms.features.topology.api.topo.CollapsibleCriteria</node>
+    <node x="1999.5627160493825" y="455.0">org.opennms.features.topology.app.internal.support.AlarmHopCriteria.AlarmVertex</node>
+    <node x="321.25" y="257.0">org.opennms.features.topology.api.topo.Edge</node>
+    <node x="339.0" y="529.0">org.opennms.features.topology.api.topo.WrappedEdge</node>
+    <node x="870.0" y="455.0">org.opennms.features.topology.plugins.topo.BundleContextHistoryManagerTest.TestVertex</node>
+    <node x="2155.6460493827162" y="455.0">org.opennms.features.topology.app.internal.support.IpLikeHopCriteria.IPVertex</node>
+    <node x="1342.757160493827" y="257.0">org.opennms.features.topology.api.topo.Vertex</node>
+    <node x="331.75" y="158.0">org.opennms.features.topology.api.topo.EdgeRef</node>
+    <node x="1261.1656790123457" y="336.0">org.opennms.features.topology.api.topo.AbstractVertex</node>
+    <node x="584.0" y="455.0">org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSServiceCriteria</node>
+    <node x="1420.3221604938271" y="336.0">org.opennms.features.topology.api.topo.WrappedGroup</node>
+    <node x="1795.4793827160493" y="455.0">org.opennms.features.topology.app.internal.support.CategoryHopCriteria.CategoryVertex</node>
+    <node x="2432.395061728395" y="158.0">org.opennms.features.topology.api.topo.ConnectorRef</node>
+    <node x="1779.4793827160493" y="336.0">org.opennms.features.topology.app.internal.support.CategoryHopCriteria</node>
+    <node x="1496.5" y="455.0">org.opennms.features.topology.api.topo.SimpleLeafVertex</node>
+    <node x="2442.395061728395" y="257.0">org.opennms.features.topology.api.topo.Connector</node>
+    <node x="2259.395061728395" y="336.0">org.opennms.features.topology.app.internal.support.IpLikeHopCriteria</node>
+    <node x="403.25" y="257.0">org.opennms.features.topology.api.topo.AbstractEdgeRef</node>
+    <node x="1545.8221604938271" y="257.0">org.opennms.features.topology.api.topo.WrappedVertex</node>
+    <node x="1153.0" y="455.0">org.opennms.features.topology.api.topo.SimpleGroup</node>
+    <node x="0.0" y="529.0">org.opennms.features.topology.api.topo.RefComparator</node>
+    <node x="752.0" y="455.0">org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSVertex</node>
+    <node x="1045.757160493827" y="257.0">org.opennms.features.topology.api.topo.DefaultVertexRef</node>
+    <node x="542.4756790123456" y="158.0">org.opennms.features.topology.api.topo.AbstractRef</node>
+    <node x="367.0" y="455.0">org.opennms.features.topology.app.internal.TestEdge</node>
+    <node x="476.0" y="455.0">org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSEdge</node>
+    <node x="785.6321604938271" y="158.0">org.opennms.features.topology.api.topo.AbstractSearchProviderTest</node>
+    <node x="1203.757160493827" y="257.0">org.opennms.features.topology.api.topo.AbstractSearchProviderTest.TestVertexRef</node>
+    <node x="2421.395061728395" y="336.0">org.opennms.features.topology.api.topo.SimpleConnector</node>
+    <node x="1564.3221604938271" y="336.0">org.opennms.features.topology.api.topo.WrappedLeafVertex</node>
+    <node x="104.0" y="455.0">org.opennms.features.topology.app.internal.VEProviderGraphContainer.ScaleProperty</node>
+    <node x="240.0" y="455.0">org.opennms.features.topology.app.internal.VEProviderGraphContainer.PseudoEdge</node>
+    <node x="1988.3950617283951" y="336.0">org.opennms.features.topology.api.topo.GroupRef</node>
+    <node x="2098.3950617283954" y="336.0">org.opennms.features.topology.app.internal.support.AlarmHopCriteria</node>
+    <node x="1285.0" y="455.0">org.opennms.features.topology.app.internal.TestVertex</node>
+    <node x="769.75" y="336.0">org.opennms.features.topology.plugins.topo.BundleContextHistoryManagerTest</node>
+    <node x="588.5" y="336.0">org.opennms.features.topology.plugins.ncs.NCSEdgeProvider</node>
+    <node x="910.0" y="0.0">java.lang.Comparable</node>
+    <node x="679.797839506173" y="257.0">org.opennms.features.topology.api.topo.AbstractSearchProviderTest.ExactMatcher</node>
+    <node x="64.0" y="336.0">org.opennms.features.topology.app.internal.VEProviderGraphContainer</node>
+    <node x="354.0" y="336.0">org.opennms.features.topology.api.topo.AbstractEdge</node>
+    <node x="171.0" y="529.0">org.opennms.features.topology.api.topo.WrappedGraph</node>
+    <node x="1420.5" y="158.0">org.opennms.features.topology.api.topo.VertexRef</node>
+    <node x="937.5" y="79.0">org.opennms.features.topology.api.topo.Ref</node>
+    <node x="815.797839506173" y="257.0">org.opennms.features.topology.api.topo.AbstractSearchProviderTest.ContainsMatcher</node>
+    <node x="0.0" y="455.0">org.opennms.features.topology.app.internal.VEProviderGraphContainer.VEGraph</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.opennms.features.topology.app.internal.support.IpLikeHopCriteria.IPVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="-27.666666666666515" y="-14.5" />
+      <point x="2169.4793827160493" y="395.0" />
+      <point x="1379.2212345679013" y="395.0" />
+      <point x="55.55555555555566" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.IpLikeHopCriteria" target="org.opennms.features.topology.api.topo.CollapsibleCriteria">
+      <point x="0.0" y="-14.5" />
+      <point x="2330.395061728395" y="316.0" />
+      <point x="2230.7083333333335" y="316.0" />
+      <point x="49.333333333333485" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractSearchProviderTest.ContainsMatcher" target="org.opennms.features.topology.api.topo.AbstractSearchProviderTest">
+      <point x="0.0" y="-14.5" />
+      <point x="884.797839506173" y="237.0" />
+      <point x="887.6321604938271" y="237.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.AlarmHopCriteria.AlarmVertex" target="org.opennms.features.topology.app.internal.support.AlarmHopCriteria">
+      <point x="36.333333333333485" y="-14.5" />
+      <point x="2090.3960493827162" y="435.0" />
+      <point x="2168.8950617283954" y="435.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractRef" target="org.opennms.features.topology.api.topo.Ref">
+      <point x="0.0" y="-14.5" />
+      <point x="594.9756790123456" y="138.0" />
+      <point x="957.0" y="138.0" />
+      <point x="-6.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractEdge" target="org.opennms.features.topology.api.topo.Edge">
+      <point x="-28.75" y="-14.5" />
+      <point x="382.75" y="316.0" />
+      <point x="352.25" y="316.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.Edge" target="org.opennms.features.topology.api.topo.EdgeRef">
+      <point x="0.0" y="-14.5" />
+      <point x="-20.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.VEProviderGraphContainer.PseudoEdge" target="org.opennms.features.topology.api.topo.AbstractEdge">
+      <point x="26.75" y="-14.5" />
+      <point x="320.25" y="435.0" />
+      <point x="373.16666666666674" y="435.0" />
+      <point x="-38.333333333333314" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.CategoryHopCriteria.CategoryVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="-42.66666666666674" y="-14.5" />
+      <point x="1816.8127160493825" y="415.0" />
+      <point x="1351.4434567901235" y="415.0" />
+      <point x="27.77777777777783" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.EdgeRef" target="org.opennms.features.topology.api.topo.Ref">
+      <point x="0.0" y="-14.5" />
+      <point x="372.75" y="128.0" />
+      <point x="944.0" y="128.0" />
+      <point x="-19.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.CategoryHopCriteria.CategoryVertex" target="org.opennms.features.topology.api.topo.GroupRef">
+      <point x="42.66666666666674" y="-14.5" />
+      <point x="1902.146049382716" y="435.0" />
+      <point x="2003.3950617283951" y="435.0" />
+      <point x="-30.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.IpLikeHopCriteria.IPVertex" target="org.opennms.features.topology.api.topo.GroupRef">
+      <point x="0.0" y="-14.5" />
+      <point x="2197.1460493827162" y="385.0" />
+      <point x="2063.3950617283954" y="385.0" />
+      <point x="30.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSEdge" target="org.opennms.features.topology.api.topo.AbstractEdge">
+      <point x="-22.0" y="-14.5" />
+      <point x="498.0" y="435.0" />
+      <point x="449.83333333333337" y="435.0" />
+      <point x="38.33333333333337" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSVertex" target="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider">
+      <point x="-24.5" y="-14.5" />
+      <point x="776.5" y="435.0" />
+      <point x="704.3333333333334" y="435.0" />
+      <point x="46.33333333333337" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.Ref" target="java.lang.Comparable">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.topo.BundleContextHistoryManagerTest.TestVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="24.75" y="-14.5" />
+      <point x="944.25" y="415.0" />
+      <point x="1281.9990123456791" y="415.0" />
+      <point x="-41.66666666666674" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractSearchProviderTest.TestVertexRef" target="org.opennms.features.topology.api.topo.VertexRef">
+      <point x="29.75" y="-14.5" />
+      <point x="1293.007160493827" y="227.0" />
+      <point x="1448.1" y="227.0" />
+      <point x="-18.40000000000009" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.IpLikeHopCriteria.IPVertex" target="org.opennms.features.topology.app.internal.support.IpLikeHopCriteria">
+      <point x="27.666666666666515" y="-14.5" />
+      <point x="2224.8127160493823" y="435.0" />
+      <point x="2330.395061728395" y="435.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.WrappedVertex" target="org.opennms.features.topology.api.topo.VertexRef">
+      <point x="0.0" y="-14.5" />
+      <point x="1608.8221604938271" y="237.0" />
+      <point x="1484.9" y="237.0" />
+      <point x="18.40000000000009" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.VEProviderGraphContainer.ScaleProperty" target="org.opennms.features.topology.app.internal.VEProviderGraphContainer">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="24.5" y="-14.5" />
+      <point x="825.5" y="405.0" />
+      <point x="1268.11012345679" y="405.0" />
+      <point x="-55.55555555555566" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.WrappedGroup" target="org.opennms.features.topology.api.topo.WrappedVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="1482.3221604938271" y="316.0" />
+      <point x="1577.3221604938271" y="316.0" />
+      <point x="-31.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.topo.application.ApplicationVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="1061.0" y="425.0" />
+      <point x="1295.8879012345678" y="425.0" />
+      <point x="-27.77777777777783" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.SimpleGroup" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="1209.0" y="435.0" />
+      <point x="1309.776790123457" y="435.0" />
+      <point x="-13.888888888888914" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractVertex" target="org.opennms.features.topology.api.topo.DefaultVertexRef">
+      <point x="-31.25" y="-14.5" />
+      <point x="1292.4156790123457" y="316.0" />
+      <point x="1114.757160493827" y="316.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractSearchProviderTest.TestVertexRef" target="org.opennms.features.topology.api.topo.AbstractSearchProviderTest">
+      <point x="-29.75" y="-14.5" />
+      <point x="1233.507160493827" y="207.0" />
+      <point x="955.6321604938271" y="207.0" />
+      <point x="68.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractEdgeRef" target="org.opennms.features.topology.api.topo.EdgeRef">
+      <point x="-33.75" y="-14.5" />
+      <point x="437.0" y="237.0" />
+      <point x="393.25" y="237.0" />
+      <point x="20.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.TestVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="1334.5" y="435.0" />
+      <point x="1323.6656790123457" y="435.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.SimpleConnector" target="org.opennms.features.topology.api.topo.Connector">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractSearchProviderTest.ExactMatcher" target="org.opennms.features.topology.api.topo.AbstractSearchProviderTest">
+      <point x="0.0" y="-14.5" />
+      <point x="737.797839506173" y="237.0" />
+      <point x="819.6321604938271" y="237.0" />
+      <point x="-68.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.CategoryHopCriteria.CategoryVertex" target="org.opennms.features.topology.app.internal.support.CategoryHopCriteria">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.WrappedLeafVertex" target="org.opennms.features.topology.api.topo.WrappedVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="31.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.TestEdge" target="org.opennms.features.topology.api.topo.AbstractEdge">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.Vertex" target="org.opennms.features.topology.api.topo.VertexRef">
+      <point x="0.0" y="-14.5" />
+      <point x="1378.757160493827" y="237.0" />
+      <point x="1466.5" y="237.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.VertexRef" target="org.opennms.features.topology.api.topo.Ref">
+      <point x="0.0" y="-14.5" />
+      <point x="1466.5" y="138.0" />
+      <point x="970.0" y="138.0" />
+      <point x="6.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.ConnectorRef" target="org.opennms.features.topology.api.topo.Ref">
+      <point x="0.0" y="-14.5" />
+      <point x="2490.895061728395" y="128.0" />
+      <point x="983.0" y="128.0" />
+      <point x="19.5" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.AlarmHopCriteria.AlarmVertex" target="org.opennms.features.topology.api.topo.GroupRef">
+      <point x="0.0" y="-14.5" />
+      <point x="2054.0627160493823" y="435.0" />
+      <point x="2033.3950617283951" y="435.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.DefaultVertexRef" target="org.opennms.features.topology.api.topo.VertexRef">
+      <point x="34.5" y="-14.5" />
+      <point x="1149.257160493827" y="217.0" />
+      <point x="1429.7" y="217.0" />
+      <point x="-36.799999999999955" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.GroupRef" target="org.opennms.features.topology.api.topo.VertexRef">
+      <point x="0.0" y="-14.5" />
+      <point x="2033.3950617283951" y="306.0" />
+      <point x="2001.0721604938271" y="306.0" />
+      <point x="2001.0721604938271" y="227.0" />
+      <point x="1503.3" y="227.0" />
+      <point x="36.799999999999955" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.VEProviderGraphContainer.VEGraph" target="org.opennms.features.topology.app.internal.VEProviderGraphContainer">
+      <point x="0.0" y="-14.5" />
+      <point x="42.0" y="435.0" />
+      <point x="96.66666666666674" y="435.0" />
+      <point x="-65.33333333333333" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.CategoryHopCriteria" target="org.opennms.features.topology.api.topo.CollapsibleCriteria">
+      <point x="0.0" y="-14.5" />
+      <point x="1859.4793827160493" y="316.0" />
+      <point x="2132.0416666666665" y="316.0" />
+      <point x="-49.333333333333485" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSEdge" target="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider">
+      <point x="22.0" y="-14.5" />
+      <point x="542.0" y="435.0" />
+      <point x="611.6666666666666" y="435.0" />
+      <point x="-46.33333333333337" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.DefaultVertexRef" target="org.opennms.features.topology.api.topo.AbstractRef">
+      <point x="-34.5" y="-14.5" />
+      <point x="1080.257160493827" y="227.0" />
+      <point x="621.2256790123456" y="227.0" />
+      <point x="26.25" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.topo.BundleContextHistoryManagerTest.TestVertex" target="org.opennms.features.topology.plugins.topo.BundleContextHistoryManagerTest">
+      <point x="-24.75" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractEdgeRef" target="org.opennms.features.topology.api.topo.AbstractRef">
+      <point x="33.75" y="-14.5" />
+      <point x="504.5" y="237.0" />
+      <point x="568.7256790123456" y="237.0" />
+      <point x="-26.25" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.AlarmHopCriteria.AlarmVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="-36.33333333333326" y="-14.5" />
+      <point x="2017.7293827160493" y="405.0" />
+      <point x="1365.3323456790126" y="405.0" />
+      <point x="41.66666666666674" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.support.AlarmHopCriteria" target="org.opennms.features.topology.api.topo.CollapsibleCriteria">
+      <point x="0.0" y="-14.5" />
+      <point x="2168.8950617283954" y="316.0" />
+      <point x="2181.375" y="316.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.app.internal.VEProviderGraphContainer.PseudoEdge" target="org.opennms.features.topology.app.internal.VEProviderGraphContainer">
+      <point x="-26.75" y="-14.5" />
+      <point x="266.75" y="435.0" />
+      <point x="227.33333333333326" y="435.0" />
+      <point x="65.33333333333331" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractVertex" target="org.opennms.features.topology.api.topo.Vertex">
+      <point x="31.25" y="-14.5" />
+      <point x="1354.9156790123457" y="316.0" />
+      <point x="1378.757160493827" y="316.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider.NCSServiceCriteria" target="org.opennms.features.topology.plugins.ncs.NCSEdgeProvider">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.SimpleLeafVertex" target="org.opennms.features.topology.api.topo.AbstractVertex">
+      <point x="0.0" y="-14.5" />
+      <point x="1566.5" y="425.0" />
+      <point x="1337.5545679012348" y="425.0" />
+      <point x="13.888888888888914" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.Connector" target="org.opennms.features.topology.api.topo.ConnectorRef">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="org.opennms.features.topology.api.topo.AbstractEdge" target="org.opennms.features.topology.api.topo.AbstractEdgeRef">
+      <point x="28.75" y="-14.5" />
+      <point x="440.25" y="316.0" />
+      <point x="470.75" y="316.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.33514141805501746" x="1280.5" y="279.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

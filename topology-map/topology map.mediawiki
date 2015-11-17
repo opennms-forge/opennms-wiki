@@ -1,0 +1,241 @@
+
+== Overview ==
+
+The general idea of the Topology Map (also often named STUI or Topology Application) is to show any number of points with any number of connections in between.
+Each point on the Topology Map is called a Vertex, whereas a connection between two Vertices is called an Edge.
+An Edge always has a source and a target Vertex. Even if this indicates a direction, an Edge is not directed.
+The Vertices and Edges shown on the Topology Map are called Topology or Graph.
+
+The following figure shows a graph with 5 Vertices and 4 Edges.
+
+[[File:Toplogy-graph.png|400px]]
+
+In order to visualize the Topology, a Layout defines where each Vertex is located (x and y coordinates).
+Each position of each Vertex is calculated by a Layout Algorithm.
+
+The Vertices and Edges are provided by so called Vertex and Edge Providers.
+Each Vertex and Edge Provider contributes its data to a Topology.
+In order to determine if a provider contributes to a certain Topology it is bound to a namespace.
+
+As there can exist multiple Edge and Vertex providers it is necessary to uniquely identify each Vertex and Edge over all existing providers.
+To achieve this, each Vertex and Edge has a unique identifier, called Ref. This Ref is a triple of type, id and namespace.
+
+The following figure shows the core concepts of the Topology Map as described above.
+
+[[File:Topology-overview.png|400px]]
+
+== Architecture ==
+
+The basic idea of the Topology Map is to not know all Graph Providers.
+It also should allow users to extend existing functionality.
+
+In order to achieve this, OpenNMS is using the OSGi container Apache Karaf.
+OSGi provides a so called Service Registry which allows to listen for certain implementations, such as new Graph Providers.
+The following figure describes the relationship between each component and the Topology UI using the OSGi Service Registry.
+
+[[File:Topology-architecture-overview.png|400px]]
+
+Each OSGi bundle registers the defined services to the OSGi Service Registry which then are consumed by the Topology UI (directly or indirectly).
+The figure does not reflect that a bundle may provide none, one, or multiple of the shown components.
+In addition to the custom graph provider bundles a few common services are registered, too (e.g. DAOs, etc).
+
+After a bundle contributed one or more services to the OSGi Service Registry each service is bound to a Manager and on deregistration unbound.
+To bind a service means that it is available and can be used.
+To unbind a service means that it is no longer available and cannot be used anymore.
+The following figure shows the core "listeners" of the Topology Map.
+
+[[File:Topology-architecture-overview2.png|800px]]
+
+The dottet lines represent a contribution to the TopologyUI.
+
+== TopologyUI ==
+The TopologyUI is a Vaadin UI implementation which handles the rendering of the Graph and allows the user to interact with it.
+
+Examples of interactions are:
+* Select a Graph Provider (e.g. Vmware)
+* Select a Rendering Layout (e.g. D3)
+* Toggle Alarm Status
+
+=== Graph Provider ===
+A Graph Provider is an entity providing Vertices and Edges to a Topology (e.g. Vmware Graph Provider) of a certain namespace.
+
+=== Operation ===
+An operation defines an action a user can perform on the Topology Map, e.g. select a Graph Provider.
+
+The following figure shows a section of the current existing Operation implementations.
+
+[[File:Topology-operations.png|400px]]
+
+; Operation
+: see above.
+
+; CheckedOperation
+: An Operation rendered with a Checkbox. It is either enabled (checked) or disabled (unchecked).
+
+; LayoutOperation
+: A LayoutOperation is an Operation to select a Layout, e.g. D3 Layout
+
+; D3TopologyLayoutOperation
+: A concrete implementation of the LayoutOperation to allow selecting the D3 Layout
+
+; TopologySelectorOperation
+: An operation to select a Graph Provider (e.g. vmware)
+
+; RedoLayoutOperation
+: A Operation to trigger a redraw of the Topology.
+
+=== Command ===
+A command binds an Operation to the Topology UI and determines where the Operation is visible (e.g. context menu, menubar, etc.);
+
+=== TopologySelector ===
+The TopologySelector is listening for GraphProviders.
+For each Graph Provider a new TopologySelectorOperation is created which then is forwarded to the CommandManager to be rendered in the Topology UI.
+This enables users to select Graphs (E.g. vmware).
+
+=== ProviderManager ===
+The ProviderManager is listeninig for Vertex- and EdgeProviders.
+This allows developers to contribute to already existing namespaces (GraphProviders).
+
+=== CommandManager ===
+The CommandManager is listening for Commands and Operations and is either updating the Topology UI's menubar or is presenting them as a right mouse click context on a certain Edge/Vertex.
+
+== Example ==
+
+The following figure shows an example of the Topology UI.
+
+[[File:Topology-ui-example.png]]
+
+# The Header of the Topology UI
+# The MenuBar of the Topology UI. It uses the Vaadin MenuBar implementation.
+# The Topology/Graph area which shows all Vertices and Edges according to the namespace of the selected Graph Provider
+# The Browser area which shows Alarms and Nodes according to the current selection in the Topology UI. It can be customized by registering so called IViewContribution services to the OSGi Service Registry. Details are not covered in this document at the moment.
+# The elements of the MenuBar represented by Vaadin MenuItems. MenuItems can be grouped and are seperated by a seperator. Each MenuItem is represented by an Operation. The first group is the Layout group which shows all registered LayoutOperation services. The second group shows all registered Graph Provider services (see TopologySelector above). The last two groups are custom Operations.
+# A Vertex of the Graph
+# An Edge of the Graph
+
+== Namespace ==
+At this point all important parts of the Topology Map are known (except Criteria, which are covered below).
+To understand how a Graph is created it is important to understand the namespace concept.
+The next figure shows a class diagram of all elements responsible to create the graph which is shown in the UI.
+
+[[File:Topology-class-diagramm-graph-provider.png|1200px]]
+
+Please note that the diagram does not show the full hierarchy nor all attributes/methods.
+Some attributes/method may even differ from implementation, but the concept is still the same.
+
+; VertexProvider
+: The method getVertexNamespace() defines to which namespace the VertexProvider contributes to.
+: The method getVertices(Criteria[]) provides all Vertices, whereas the method getVertices(VertexRef[], Criteria[]) resolves Vertex references to real Vertex objects.
+
+; EdgeProvider
+: The method getEdgeNamespace() defines to which namespace the EdgeProvider contributes to.
+: The method getEdges(Crtiera[]) provides all Edges, whereas the method getEdges(EdgeRef[], Criteria[]) resolves Edge references to real Edge objects.
+
+; GraphProvider
+: A GraphProvider implements the Vertex- and EdgeProvider interface, whereas each provider has its own namespace.
+: In addition methods to refresh, load and save the graph are provided. Usually only the refresh-method is implemented.
+
+; MergingGraphProvider
+: A MergingGraphProvider is a concrete implementation of a GraphProvider and handles the graph creation according to the selected GraphProvider.
+: This means each time a GraphProvider is selected from the Topology UI's MenuBar the MergingGraphProvider generates the Graph as follows:
+:# Get all Edges and Vertices from the selected GraphProvider, also called the Base GraphProvider
+:# Iterate over all registered VertexProviders and add Vertices to the Graph if the namespace of the VertexProvider matches the namespace of the GraphProviders' vertex namespace
+:# Iterate over all registered EdgeProviders and add Edges to the Graph if the namespace of the EdgeProvider matches the namespace of the GraphProviders' edge namespace
+: With this concept it is possible to mix namespaces or only provide Vertex- or EdgeProviders to enrich existing GraphProviders.
+
+=== Example ===
+
+In this example there exist two GraphProviders:
+# DefaultGraphProvider
+# SimpleGraphProvider
+
+The DefaultGraphProvider's Vertex- and EdgeProvider-Namespaces are "default".
+The SimpleGraphProvider defines the same Vertex- and EdgeProvider namespaces.
+
+If a user now selects either of both Graph Providers the Vertices and Edges of both show up in the Topology UI even if they are completly seperate providers, but share the same namespace.
+
+If there is also a CustomVertexProvider in addition to the Graph Providers registered, and that VertexProvider also has the namsepace "default" it can contribute to the Graph as well.
+
+== Refs ==
+As described above multiple Vertex- (and therefore also GraphProviders) can contribute to multiple GraphProviders, but each Vertex/Edge must be uniquely identified over all existing providers.
+The following Vertices are defined by different VertexProviders:
+
+; Vertex 1 from VertexProvider 1
+: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 1
+
+; Vertex 2 from VertexProvider 1
+: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 2
+
+; Vertex 3 from VertexProvider 2
+: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 1
+
+; Vertex 4 from VertexProvider 2
+: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 7
+
+; Vertex 5 from VertexProvider 3
+: Ref-Type: Vertex, Ref-Namespace: "default", Ref-Id: 1
+
+; Vertex 6 from VertexProvider 3
+: Ref-Type: Vertex, Ref-Namespace: "default", Ref-Id: 2
+
+The resulting Graph by selecting a GraphProvider with the namespace "test" or "default" is visualized as follows:
+
+[[File:Topology-ref-namespace-dilemma.png]]
+
+Each bubble represents an identifier of a Vertex.
+Each color represents a different namespace.
+Vertex 1 and Vertex 3 are as per definition unique and therefore also show up once.
+
+== Criteria ==
+
+A Criteria is used to change the behaviour of a Graph Provider in any way.
+Each Edge- and VertexProvider may or may not consider Criteria-Objects to filter/enrich or change the behaviour of the provider.
+Common use cases are:
+* Filter Vertices
+* Group Vertices
+* Only show Vertices within 3 hops away from each focal point
+
+[[File:TODO.png]]
+
+; Criteria
+: The base class of all Criteria impelementations. There is no shared API
+
+; CollabsibleCriteria
+: An interface describing if a Criteria is collabsible. This enables grouping. The more you zoom in the more Vertices/Edges are shown. If you zoom out Vertices are grouped.
+
+; ApplicationCriteria
+: Criteria to define the currently selected Application (Application Graph Provider)
+
+; MatchingCriteria
+: Criteria to filter Edges by their label.
+: It is not used at the moment, but can be used to only show edges with a certain regular expression.
+
+; SemanticZoomLevelCriteria
+: Criteria to define the current semantic zoom level.
+
+; VertexHopCriteria
+: The number of Edges traversed to get from Vertex A to Vertex B is called a Hop. The base class of all Criteria supporing Hops.
+
+; AlarmHopCriteria
+:
+
+; CategoryHopCriteria
+:
+
+; IpLikeHopCriteria
+:
+
+; LinkdHopCriteria
+: Is used by the EnhancedLinkdTopologyProvider to show nodes if they are not in the current focus.
+: This enables users to use the SearchBox (upper left in the TopologyUI) to add Vertices manually.
+: May be replaced by the FocusNodeHopCriteria.
+
+; FocusNodeHopCriteria
+: Criteria to store all Vetices in the current Focus. This is either achieved by the
+
+== Problems ==
+
+* Vertex and Edge providers are bound to a namespace. Not necessarily the same.
+* A graph provider implements VertexProvider and EdgeProvider, and can therefore theoretically contribute Vertices to "namespace1" and Edges to "namespace2", this is weired
+* There is a MergingGraphProvider having a base topology provider and also multiple edges and vertex providers which can contribute vertices and edges to the shown graph as well (this is also weired)
+* Object instantiation dilemma (Session scope, Application Scope, etc.)
