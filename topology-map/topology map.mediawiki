@@ -1,120 +1,234 @@
+== Introduction ==
+This section describes the general architecture of the Topology Map (also often named STUI or Topology Application).
+The document is structured in two sections:
+# Concepts: covering the basic concepts of the Topology Map.
+# Architecture: covering the details of the implementation and the general architecture.
 
-== Overview ==
+=== Delimitation ===
+This document may not cover all aspects of the current Topology Map implementation.
+Especially the client side UI rendering is not described in detail.
+In general it is refered to it as the "Topology UI".
+This has to be described in more detail in future iterations, e.g. how D3.js is integrated, the difference between GraphProvider and GraphContainer (UI vs Service layer).
 
-The general idea of the Topology Map (also often named STUI or Topology Application) is to show any number of points with any number of connections in between.
+=== Contribution ===
+If you want to change images, the raw image files are located [https://github.com/opennms-forge/opennms-wiki here].
+
+== Concepts ==
+The general idea of the Topology Map is to visualize a Topology or Graph.
+Each Graph consists of any number of points with any number of connections in between.
 Each point on the Topology Map is called a Vertex, whereas a connection between two Vertices is called an Edge.
 An Edge always has a source and a target Vertex. Even if this indicates a direction, an Edge is not directed.
-The Vertices and Edges shown on the Topology Map are called Topology or Graph.
-
-The following figure shows a graph with 5 Vertices and 4 Edges.
+The following figure shows a graph with five Vertices and four Edges.
 
 [[File:Toplogy-graph.png|400px]]
 
-In order to visualize the Topology, a Layout defines where each Vertex is located (x and y coordinates).
-Each position of each Vertex is calculated by a Layout Algorithm.
-
-The Vertices and Edges are provided by so called Vertex and Edge Providers.
+The Vertices and Edges are provided by Vertex and Edge Providers.
 Each Vertex and Edge Provider contributes its data to a Topology.
-In order to determine if a provider contributes to a certain Topology it is bound to a namespace.
-
-As there can exist multiple Edge and Vertex providers it is necessary to uniquely identify each Vertex and Edge over all existing providers.
-To achieve this, each Vertex and Edge has a unique identifier, called Ref. This Ref is a triple of type, id and namespace.
-
+In addition each Vertex and Edge is identified by a Ref.
 The following figure shows the core concepts of the Topology Map as described above.
 
 [[File:Topology-overview.png|400px]]
 
+=== Namespace ===
+There can exist multiple Topologies (e.g. Vmware, Linkd) and therefore also multiple Edge and Vertex providers.
+To differentiate if a provider contributes to a Graph, each provider is bound to a namespace.
+The selection of a Graph always only shows the Vertices/Edges of that namespace.
+The following figure visualizes this.
+
+[[File:Topology-namespace.png|400px]]
+
+The orange Vertices/Edges represent the Graph of namespace "vmware", whereas the green Vertices/Edges represent the Graph of namespace "linkd".
+If one selects the namespace "vmware" only orange Vertices/Edges are shown.
+The Graph of a namespace is build as follows:
+# Iterate over all known VertexProviders and add Vertices to the Graph if the namespace of the VertexProvider matches the namespace of the Graph
+# Iterate over all known EdgeProviders and add Edges to the Graph if the namespace of the EdgeProvider matches the namespace of the Graph
+(Of course this is more complex and is covered in more detail below)
+
+=== Ref ===
+As described above multiple Vertex and Edge providers can contribute to a Graph. In order to determine which Vertex/Edge belongs to which provider it must be uniquely identified over all existing providers.
+Each Vertex and Edge has a unique identifier, called Ref used as an identifier for Vertices and Edges.
+The Ref is a triple of type, id and namespace.
+The following Vertices are defined by different VertexProviders:
+
+; Vertex 1 from VertexProvider 1
+: Ref-Type: Vertex, Ref-Namespace: "vmware", Ref-Id: 1.
+
+; Vertex 2 from VertexProvider 1
+: Ref-Type: Vertex, Ref-Namespace: "vmware", Ref-Id: 2.
+
+; Vertex 3 from VertexProvider 2
+: Ref-Type: Vertex, Ref-Namespace: "vmware", Ref-Id: 1.
+
+; Vertex 4 from VertexProvider 2
+: Ref-Type: Vertex, Ref-Namespace: "vmware", Ref-Id: 7.
+
+; Vertex 5 from VertexProvider 3
+: Ref-Type: Vertex, Ref-Namespace: "linkd", Ref-Id: 1.
+
+; Vertex 6 from VertexProvider 3
+: Ref-Type: Vertex, Ref-Namespace: "linkd", Ref-Id: 2.
+
+The resulting Graph by selecting the namespace "vmware" or "link" is visualized as follows:
+
+[[File:Topology-ref-namespace-dilemma.png]]
+
+Each bubble represents an identifier of a Vertex.
+Each color represents a different namespace.
+Vertex 1 of VertexProvider 1 and 2 are as per definition unique and therefore only show up once.
+
+=== Semantic Zoom Level ===
+Some Graphs easily contain large numbers of Vertices (~50.000) and a representive number of Edges in between.
+This results in a Topology with too much information to be of any use to a user.
+To limit the number of visible Vertices to a reasonable amount the concept of a Focus is used.
+Only Vertices in Focus (or defined as a Focal Point) are visible to the user.
+In addition it is possible to control the neighbors to show.
+The neigbors to show are determined by the Semantic Zoom Level.
+This defines the maximum distance of each Vertex to each Vertex in Focus in order to be visible to the user.
+In the following Graph Vertex 1 and Vertex 6 are in Focus (visualized by blue bubbles)
+
+[[File:Topology-semantic-zoom-level-graph.png]]
+
+The neighbor of Vertex 1 is Vertex 3.
+The neighbor of Vertex 6 is Vertex 5.
+The distance between two Vertices is also called a Hop.
+The distance from each Vertex to its neighbor is 1 Hop.
+The minimal distance between Vertex 1 and Vertex 7 is 3 Hops.
+The minimal distance between Vertex 6 and Vertex 7 is 2 Hops.
+Given the example above and using a Semantic Zoom Level of 1 (max distance 1 Hop) the following Vertices are visible:
+* Vertex 1 and Vertex 6 as they are the Focal Points
+* Vertex 3 and Vertex 5 as they are 1 Hop away from the defined Focal Points
+
+Vertex 8 becomes only visible if Vertex 7 is defined as Focal Point or the Semantic Zoom Level is increased to at least 3.
+
+=== Search ===
+Only Vertices in Focus are shown to the user in addition to its neighbors controlled by the Semantic Zoom Level.
+A reasonable default Focus may be provided but may not be the Vertices a user is looking for.
+To allow adding Vertices to the Focus a user performs a search to manually add Vertices to the Focus.
+The following figure shows how a search is performed:
+
+[[File:Topology-searchprovider.png]]
+
+; SearchQuery
+: The SearchQuery is the query a user entered in the SearchBox in the Topology UI to search for, e.g. iplike=192.168.2.1.
+: A SearchQuery may contain wildcards.
+
+; SearchProvider
+: A SearchProvider may be able to parse a SearchQuery. If it is able to parse the query none, one or multiple SearchResults are provided according to the SearchQuery.
+
+; SearchResult
+: The result of the search, which uniquely identifies an element on the Graph to be added to the Focus.
+
+=== Visualization ===
+To visualize a Graph each Vertex and Edge must be visualized by an appropriate element (e.g. Bubble for Vertices, and a Line for Edges).
+In addition each Vertex must be placed at a concrete position on the screen so that the Vertices do not overlap.
+The positions are calculated by a Layout Algorithm to assign x and y coordinates to each Vertex.
+The Layout of the Graph is the concrete positioning of the Vertices.
+Edges do not have a concrete position, as they are always connected to two Vertices and always have to be visualized as a connection between them.
+
 == Architecture ==
+The basic architecture idea is to not know all implementations and be able to extend existing functionality.
+To achieve this, OpenNMS is using the OSGi container [http://karaf.apache.org/ Apache Karaf].
+OSGi provides a so called Service Registry which allows to listen for concrete implementations of a defined interface.
+The following figure describes the relationship between each interface in the Topology UI and the OSGi Service Registry.
 
-The basic idea of the Topology Map is to not know all Graph Providers.
-It also should allow users to extend existing functionality.
+[[File:Topology-architecture-overview.png|600px]]
 
-In order to achieve this, OpenNMS is using the OSGi container Apache Karaf.
-OSGi provides a so called Service Registry which allows to listen for certain implementations, such as new Graph Providers.
-The following figure describes the relationship between each component and the Topology UI using the OSGi Service Registry.
+; GraphProvider
+: A Graph Provider is an entity providing a Graph of a certain namespace (e.g. Vmware).
 
-[[File:Topology-architecture-overview.png|400px]]
+; EdgeProvider
+: An EdgeProvider provides edges to a certain namespace.
 
-Each OSGi bundle registers the defined services to the OSGi Service Registry which then are consumed by the Topology UI (directly or indirectly).
-The figure does not reflect that a bundle may provide none, one, or multiple of the shown components.
-In addition to the custom graph provider bundles a few common services are registered, too (e.g. DAOs, etc).
+; VertexProvider
+: A VertesProvider provides vertices to a certain namsepace.
 
+; Operation
+: An operation defines an action a user can perform on the Topology Map, e.g. select a Graph Provider.
+
+; Command
+: A command binds an Operation to the Topology UI and determines where the Operation is visible (e.g. context menu, menubar, etc.).
+
+; SearchProvider
+: A SearchProvider provides functionality to deal with SearchQuerys and provide SearchResults.
+
+; IViewContribution
+: The IViewContribution provides a View component to be shown in the Topology UI, e.g. a new table in the browsers section.
+
+Each custom OSGi bundle registers concrete implementations of the defined interfaces as services to the OSGi Service Registry which then are consumed by the Topology UI (directly or indirectly).
+The figure does not reflect that a bundle may provide none, one, or multiple of the shown implementations.
+In addition to the services provided by each custom OSGi bundle a few common services such as DAOs are always available.
 After a bundle contributed one or more services to the OSGi Service Registry each service is bound to a Manager and on deregistration unbound.
 To bind a service means that it is available and can be used.
 To unbind a service means that it is no longer available and cannot be used anymore.
-The following figure shows the core "listeners" of the Topology Map.
+The following figure shows the core Managers of the Topology Map.
 
 [[File:Topology-architecture-overview2.png|800px]]
 
 The dottet lines represent a contribution to the TopologyUI.
+There is no entity listening to SearchProvider implementations. The SearchProviders are directly loaded from the OSGi Service Registry if needed.
 
-== TopologyUI ==
+;  ProviderManager
+: The ProviderManager is listeninig for Vertex- and EdgeProviders.
+: This allows developers to contribute to already existing namespaces (GraphProviders).
+
+; WidgetManager
+: The WidgetManager is listening to IViewContributions.
+: This allows developers to add new view elements to the browsers section of the Topology UI.
+
+; TopologySelector
+: The TopologySelector is listening for GraphProviders.
+: For each GraphProvider a new TopologySelectorOperation is created which then is forwarded to the CommandManager to be rendered in the Topology UI.
+: This enables users to select GraphProviders (E.g. vmware).
+: Please note that a user always selects the GraphProvider and not the Graph. The Graph is created after the GraphProvider has been selected.
+
+; CommandManager
+: The CommandManager is listening for Commands and Operations and is either updating the Topology UI's menubar or is presenting them as a context menu (e.g. right click on Edge, Vertex, Topology).
+
+=== Topology UI ===
+The Topology UI is the part of the application which is visible to the user.
+The following figure shows the Topology UI and describes where a user can find what functionality.
+
+[[File:Topology-ui-example.png|1000px]]
+
+# The Header of the Topology UI.
+# The MenuBar of the Topology UI. It uses the Vaadin MenuBar implementation.
+# The Topology/Graph area which shows all Vertices and Edges according to the namespace of the selected Graph Provider.
+# The Browser area which shows Alarms and Nodes according to the current selection in the Topology UI. It can be customized by registering so called IViewContribution services to the OSGi Service Registry. Details are not covered in this document at the moment.
+# The elements of the MenuBar represented by Vaadin MenuItems. MenuItems can be grouped and are seperated by a seperator. Each MenuItem is represented by an Operation. The first group is the Layout group which shows all registered LayoutOperation services. The second group shows all registered Graph Provider services (see TopologySelector above). The last two groups are custom Operations.
+# A Vertex of the Graph.
+# An Edge of the Graph.
+
 The TopologyUI is a Vaadin UI implementation which handles the rendering of the Graph and allows the user to interact with it.
-
 Examples of interactions are:
-* Select a Graph Provider (e.g. Vmware)
+* Select a GraphProvider (e.g. Vmware)
 * Select a Rendering Layout (e.g. D3)
 * Toggle Alarm Status
 
-=== Graph Provider ===
-A Graph Provider is an entity providing Vertices and Edges to a Topology (e.g. Vmware Graph Provider) of a certain namespace.
-
-=== Operation ===
-An operation defines an action a user can perform on the Topology Map, e.g. select a Graph Provider.
-
+=== Operations ===
 The following figure shows a section of the current existing Operation implementations.
 
 [[File:Topology-operations.png|400px]]
 
 ; Operation
-: see above.
+: Common interface for all Operations. This is required to be able to register operations to the OSGi Service Registry.
 
 ; CheckedOperation
-: An Operation rendered with a Checkbox. It is either enabled (checked) or disabled (unchecked).
+: Common interface for An Operation rendered with a Checkbox. It is either enabled (checked) or disabled (unchecked). This is required to be able to register (checked) operations to the OSGI Service Registry.
 
 ; LayoutOperation
-: A LayoutOperation is an Operation to select a Layout, e.g. D3 Layout
+: A LayoutOperation is an Operation to select a Layout, e.g. D3 Layout. This is required to be able to register (layout) operations to the OSGi Service Registry.
 
 ; D3TopologyLayoutOperation
-: A concrete implementation of the LayoutOperation to allow selecting the D3 Layout
+: A concrete implementation of the LayoutOperation to allow selecting the D3 Layout.
 
 ; TopologySelectorOperation
-: An operation to select a Graph Provider (e.g. vmware)
+: An operation to select a Graph Provider (e.g. vmware).
 
 ; RedoLayoutOperation
 : A Operation to trigger a redraw of the Topology.
 
-=== Command ===
-A command binds an Operation to the Topology UI and determines where the Operation is visible (e.g. context menu, menubar, etc.);
-
-=== TopologySelector ===
-The TopologySelector is listening for GraphProviders.
-For each Graph Provider a new TopologySelectorOperation is created which then is forwarded to the CommandManager to be rendered in the Topology UI.
-This enables users to select Graphs (E.g. vmware).
-
-=== ProviderManager ===
-The ProviderManager is listeninig for Vertex- and EdgeProviders.
-This allows developers to contribute to already existing namespaces (GraphProviders).
-
-=== CommandManager ===
-The CommandManager is listening for Commands and Operations and is either updating the Topology UI's menubar or is presenting them as a right mouse click context on a certain Edge/Vertex.
-
-== Example ==
-
-The following figure shows an example of the Topology UI.
-
-[[File:Topology-ui-example.png]]
-
-# The Header of the Topology UI
-# The MenuBar of the Topology UI. It uses the Vaadin MenuBar implementation.
-# The Topology/Graph area which shows all Vertices and Edges according to the namespace of the selected Graph Provider
-# The Browser area which shows Alarms and Nodes according to the current selection in the Topology UI. It can be customized by registering so called IViewContribution services to the OSGi Service Registry. Details are not covered in this document at the moment.
-# The elements of the MenuBar represented by Vaadin MenuItems. MenuItems can be grouped and are seperated by a seperator. Each MenuItem is represented by an Operation. The first group is the Layout group which shows all registered LayoutOperation services. The second group shows all registered Graph Provider services (see TopologySelector above). The last two groups are custom Operations.
-# A Vertex of the Graph
-# An Edge of the Graph
-
-== Namespace ==
-At this point all important parts of the Topology Map are known (except Criteria, which are covered below).
+=== Namespace ===
+At this point all important bits of the Topology Map are known (except Criteria, which are covered below).
 To understand how a Graph is created it is important to understand the namespace concept.
 The next figure shows a class diagram of all elements responsible to create the graph which is shown in the UI.
 
@@ -133,97 +247,74 @@ Some attributes/method may even differ from implementation, but the concept is s
 
 ; GraphProvider
 : A GraphProvider implements the Vertex- and EdgeProvider interface, whereas each provider has its own namespace.
-: In addition methods to refresh, load and save the graph are provided. Usually only the refresh-method is implemented.
+: In addition methods to refresh, load and save a graph are provided. Usually only the refresh-method is implemented.
+: If a user selects a graph in the Topology UI she always selects a GraphProvider!
+
+; VmwareTopologyProvider
+: A GraphProvider creating a Graph for the Topology "vmware".
+
+; EnhancedLinkdTopologyProvider
+: A GraphProvider creating a Graph for the Topology "linkd" using the discovery technique "enhanced linkd".
 
 ; MergingGraphProvider
 : A MergingGraphProvider is a concrete implementation of a GraphProvider and handles the graph creation according to the selected GraphProvider.
 : This means each time a GraphProvider is selected from the Topology UI's MenuBar the MergingGraphProvider generates the Graph as follows:
-:# Get all Edges and Vertices from the selected GraphProvider, also called the Base GraphProvider
-:# Iterate over all registered VertexProviders and add Vertices to the Graph if the namespace of the VertexProvider matches the namespace of the GraphProviders' vertex namespace
-:# Iterate over all registered EdgeProviders and add Edges to the Graph if the namespace of the EdgeProvider matches the namespace of the GraphProviders' edge namespace
+:# Get all Edges and Vertices from the selected GraphProvider, also called the Base GraphProvider (e.g. VmwareTopologyProvider).
+:# Iterate over all registered VertexProviders and add Vertices to the Graph if the namespace of the VertexProvider matches the namespace of the GraphProviders' vertex namespace.
+:# Iterate over all registered EdgeProviders and add Edges to the Graph if the namespace of the EdgeProvider matches the namespace of the GraphProviders' edge namespace.
 : With this concept it is possible to mix namespaces or only provide Vertex- or EdgeProviders to enrich existing GraphProviders.
 
-=== Example ===
+Let's assume the following GraphProviders exist:
+# DefaultGraphProvider with namespace "default"
+# SimpleGraphProvider with namespace "default"
 
-In this example there exist two GraphProviders:
-# DefaultGraphProvider
-# SimpleGraphProvider
-
-The DefaultGraphProvider's Vertex- and EdgeProvider-Namespaces are "default".
-The SimpleGraphProvider defines the same Vertex- and EdgeProvider namespaces.
-
-If a user now selects either of both Graph Providers the Vertices and Edges of both show up in the Topology UI even if they are completly seperate providers, but share the same namespace.
-
+If a user now selects either of both Graph Providers the Vertices and Edges of both show up in the Topology UI - considering the uniqueness of each Vertex/Edge - even if they are completly seperate providers, but share the same namespace.
 If there is also a CustomVertexProvider in addition to the Graph Providers registered, and that VertexProvider also has the namsepace "default" it can contribute to the Graph as well.
 
-== Refs ==
-As described above multiple Vertex- (and therefore also GraphProviders) can contribute to multiple GraphProviders, but each Vertex/Edge must be uniquely identified over all existing providers.
-The following Vertices are defined by different VertexProviders:
-
-; Vertex 1 from VertexProvider 1
-: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 1
-
-; Vertex 2 from VertexProvider 1
-: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 2
-
-; Vertex 3 from VertexProvider 2
-: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 1
-
-; Vertex 4 from VertexProvider 2
-: Ref-Type: Vertex, Ref-Namespace: "test", Ref-Id: 7
-
-; Vertex 5 from VertexProvider 3
-: Ref-Type: Vertex, Ref-Namespace: "default", Ref-Id: 1
-
-; Vertex 6 from VertexProvider 3
-: Ref-Type: Vertex, Ref-Namespace: "default", Ref-Id: 2
-
-The resulting Graph by selecting a GraphProvider with the namespace "test" or "default" is visualized as follows:
-
-[[File:Topology-ref-namespace-dilemma.png]]
-
-Each bubble represents an identifier of a Vertex.
-Each color represents a different namespace.
-Vertex 1 and Vertex 3 are as per definition unique and therefore also show up once.
-
-== Criteria ==
-
-A Criteria is used to change the behaviour of a Graph Provider in any way.
+=== Criteria ===
+A Criteria is used to change the behaviour of a GraphProvider in any way.
 Each Edge- and VertexProvider may or may not consider Criteria-Objects to filter/enrich or change the behaviour of the provider.
 Common use cases are:
-* Filter Vertices
+* Search for Vertices/Edges
 * Group Vertices
 * Only show Vertices within 3 hops away from each focal point
 
-[[File:TODO.png]]
+The following figure shows a section of Criteria already implemented:
+
+[[File:Topology-criteria.png|1000px]]
 
 ; Criteria
 : The base class of all Criteria impelementations. There is no shared API
 
 ; CollabsibleCriteria
-: An interface describing if a Criteria is collabsible. This enables grouping. The more you zoom in the more Vertices/Edges are shown. If you zoom out Vertices are grouped.
+: An interface describing if a Criteria is collabsible. This enables grouping.
+: If a CollabsibleCriteria is collapsed it is replaced by a single Vertex representing the "group".
+: If it is not collapsed it is showing all "group" members.
 
 ; ApplicationCriteria
-: Criteria to define the currently selected Application (Application Graph Provider)
+: Criteria to define the currently selected Application (ApplicationGraphProvider).
 
 ; MatchingCriteria
 : Criteria to filter Edges by their label.
-: It is not used at the moment, but can be used to only show edges with a certain regular expression.
+: It is not used at the moment, but can be used to only show edges matching a certain regular expression.
 
 ; SemanticZoomLevelCriteria
-: Criteria to define the current semantic zoom level.
+: Criteria to set/read the current Semantic Zoom Level.
 
 ; VertexHopCriteria
-: The number of Edges traversed to get from Vertex A to Vertex B is called a Hop. The base class of all Criteria supporing Hops.
+: The base class of all Criteria supporting Hops.
+: Returns Vertices if a certain criteria matches them to allow manually adding Vertices to the Focus.
 
 ; AlarmHopCriteria
-:
+: Is used to enable search for nodes with certain alarms.
+: Returns Vertices for each node where the search criteria matched the alarm uei criteria of that node.
 
 ; CategoryHopCriteria
-:
+: Is used to enable search for nodes in a certain category.
+: Returns Vertices for each node where the search criteria matched the category of that node.
 
 ; IpLikeHopCriteria
-:
+: Returns Vertices for each node where the search criteria matched the ip address of that node.
 
 ; LinkdHopCriteria
 : Is used by the EnhancedLinkdTopologyProvider to show nodes if they are not in the current focus.
@@ -233,9 +324,173 @@ Common use cases are:
 ; FocusNodeHopCriteria
 : Criteria to store all Vetices in the current Focus. This is either achieved by the
 
-== Problems ==
+==== Search ====
+To understand how the criteria is used to implement the search it is necessary to understand how the search query cycle is moved through the application.
+At first a user enters her search query, e.g. "opennms.*" into the SearchBox in the upper left of the Topology UI.
+This input is then afterwards parsed to a SearchQuery object. For each SearchProvider available the SearchQuery is executed if the SearchProvider can execute the query.
+The SearchProvider then provides none, one or multiple SearchResults.
+Each SearchResult is transformed to a SearchSuggestion (UI representation) which is represented to the user.
+The following figure visualizes the search cycle.
 
-* Vertex and Edge providers are bound to a namespace. Not necessarily the same.
-* A graph provider implements VertexProvider and EdgeProvider, and can therefore theoretically contribute Vertices to "namespace1" and Edges to "namespace2", this is weired
-* There is a MergingGraphProvider having a base topology provider and also multiple edges and vertex providers which can contribute vertices and edges to the shown graph as well (this is also weired)
+[[File:Topology-search-cycle.png]]
+
+The figure below shows a section of the relevant interfaces/classes involved realizing the search for a user.
+
+[[File:Topology-searchprovider2.png|1000px]]
+
+; SearchQuery
+: The SearchQuery object represents the input of the user.
+: The method getQueryString() return the original input of the user.
+: The method matches(String) defines if the given String matches the input of the user.
+: A search query may start with a prefix to differantiate between different SearchProviders (e.g. iplike, category).
+
+; AbstractSearchQuery
+: Abstract implementation of the SearchQuery interface to be the base class of all SearchQuery implementations
+
+; AllSearchQuery
+: Convinent SearchQuery object where matches(String) always returns true.
+: This is created if the user input is "*" (match all).
+
+; ContainsSearchQuery
+: A SearchQuery object where matches(String) only returns true if the users input is contained in the provided String, e.g.:
+: User input "opennms", provided String "org.opennms.com-node1" returns true.
+: This is created if the user input is NOT "*".
+
+; SearchResult
+: Should represent a unique element of the graph, but does not do that at the moment.
+: The combination of id, namespace and label is kinda the same as the Reference to the object, except the type is missing.
+
+; SearchProvider
+: The SearchProvider is responsible for executing the SearchQuery and provide appropriate SearchResults.
+: The method query(SearchQuery, GraphContainer) : SearchResults, executes the query and provides SearchResults (may be empty).
+: The method supportsPrefix(String) : boolean determines if the current SearchProvider is able to execute a query with that prefix.
+: The method addVertexHopCriteria(SearchResult, GraphContainer) adds for the given SearchResult a VertexHopCriteria to the Graph in order to apply the criteria. This is done when the user selects a SearchSuggestion.
+: The method removeVertexHopProvider(SearchResult, GraphContainer) removes the given VertexHopCriteria for the given SearchResult from the Graph in order to remove the criteria. This is done when the user removes a SearchSuggestion from the Topology UI.
+: The method onToggleCollapse(SearchResult, GraphContainer) is invoked when the user hits the "toggle collapse" button in the SearchSuggestion Box. It allows a SearchProvider to deal with the redraw of the Graph, because now the collapsed representation must be replaced with all members or vice versa.
+
+; AbstractSearchProvider
+: Abstract implementation of a SearchProvider for convinients sake.
+
+; IpLikeSearchProvider
+: A search provider to allow search queries with the prefix "iplike" to search for nodes with a certain ip address.
+: The IpLikeSearchProvider creates an IpLikeHopCriteria if the user selected a SearchSuggestion of the IpLikeSearchProvider.
+
+; CategorySearchProvider
+: A search provider to allow search queries with the prefix "category" to search for nodes in a certain category.
+: The CategorySearchProvider creates a CategoryHopCriteria if the user selected a SearchSuggestion of the CategorySearchProvider.
+
+; AlarmSearchProvider
+: A search provider to allow search queries with the prefix "alarm" to search for nodes with associated alarms matching the uei the query string of the user.
+: The AlarmSearchProvider creates a AlarmHopCriteria if the user selected a SearchSuggestion of the AlarmSearchProvider.
+
+; EnhancedLinkdTopologyProvider
+: A search provider to allow search queries with the prefix "nodes" to search for nodes with a certain label.
+: The EnhancedLinkdTopologyProvider creates a LinkdHopCriteria if the user selected a SearchSuggestion of the EnhancedLinkdTopologyProvider.
+
+; VmwareTopologyProvider
+: A search provider to allow search queries with the prefix "nodes" to search for nodes with a certain label.
+: The VmwareTopologyProvider creates a FocusNodeHopCriteria if the user selected a SearchSuggestion of the VmwareTopologyProvider.
+
+
+All Criteria of the SearchProviders are VertexHopCriteria objects the getVertices() method of each criteria determines the number of vertices to show.
+Besides that a couple of the Criteria objects are collabsible.
+Each added VertexHopCriteria determines that the Vertices are in Focus.
+
+==== Semantic Zoom Level ====
+The Semantic Zoom Level (SZL) is implemented by a special GraphProvider implementations, the VertexHopGraphProvider.
+The following figure describes the classes involved in the implementation of the SZL feature:
+
+[[File:Topology-semantic-zoom-level.png]]
+
+The vertices in Focus are determined as follows:
+* Iterate over all existing VertexHopCriteria
+* For each VertexHopCriteria execute the method getVertices() and add them to the Focus.
+The Semantic Zoom Level is read from the SemanticZoomLevelCriteria object.
+Afterwards the Graph is created as followS:
+* If no Vertices are in focus, an empty Graph is returned
+* Otherwise a Graph with all Vertices in Focus is shown.
+* In addition all Vertices connected with each Vertex in Focus is shown if the distance is <= the Semantic Zoom Level defined in the SemanticZoomLevelCriteria object.
+
+The CollapsibleCriteria is taken in consideration as well.
+A Vertex might be in Focus but be replaced by a collapsed Vertex.
+If this is the case, the collapsed Vertex is shown instead of the Vertex in Focus.
+
+== Problems ==
+This section describes various problems with the current implementation.
+Afterwarts each problem may be discussed to decide if it is worth fixing or if it is really a problem.
+
+=== Object Instantiation Model (Session Scope vs Application Scope) ===
+To handle the service registration to the OSGi Service Registry the blueprint.xml files are used.
+In a blueprint.xml file beans are defined (as in Spring) and services can be registered, as well as references to services obtained.
+However the scope of a bean is very limited. It is either prototype or singleton.
+In the current implementation of the Topology Map in most cases the scope "prototype" is used.
+This means each time a bean is referenced and is of scope "prototype" a new instance is created.
+This also means that the beans defined as scope "prototype" should be stateless.
+It also means that each GraphProvider as of this moment is created n times and may also be initialized n times (e.g. EnhancedLinkdTopologyProvider).
+
+When the managers (as described above) listen for service registrations of a prototype bean (service) and pass that object around the Topology UI.
+But maybe more beans exist.
+Even worse, in some cases the Topology UI talks via the MergingGraphProvider to Vertices- and EdgeProviders, but as the object list may not be the right one,
+the listeners are not set up correctly and the providers cannot be reached.
+
+In addition every time a user navigates to the Topology Map the TopologyUI object is created twice.
+
+=== Criteria ===
+
+TODO
+
+
+=== OSGI Dilemma ===
+Almost all services registered to the OSGi Service Registry are saved in a Manager object of any kind.
+These objects are then passed through the TopologyUI and saved as object references.
+However they are not real objects but a proxy to the service in the OSGi Service Registry.
+This means if a feature is re-installed the reference might be already gone and was not replaced.
+This is for example the case if you have a GraphProvider selected (vmware) and uninstall the vmware feature.
+The Topology Map is then in a state of no return and OpenNMS must be restarted.
+A lot of these cases exist.
+
+=== MergingGraphProvider ===
+The MergingGraphProvider really is a service knowing all Edge- and VertexProvider as well as "remembering" which GraphProvider is currently selected.
+If there really is a need to have any number of Edge- and VertexProvider contribute to the selected edge and vertex namespace it might be wise to just "remember" the selected namespaces and simplify the GraphProvider for that matter.
+It may also be wise to rip out the functionality to have Edge- and VertexProviders contribute to a GraphProvider, as this adds complexity.
+Here the EnhancedLinkdTopologyProvider must be studied to verify if that is possible.
+
+=== Grouping ===
+A lot of "isGroup()" or "isGroupingSupported()" methods exist all over the place.
+However the grouping functionality is replaced with the CollapsibleCriteria.
+It needs to be discussed what to do with the grouping implementation and if the CollapsibleCriteria is the right replacement.
+
+=== Ref ===
+Originally there was no identifier, but the triple itself.
+A lot of legacy code still uses the old deprecated triple instead of the Ref object to identify an object.
+Besides explaining a Vertex/Edge has a Ref as an identifier this is not the fact.
+Each Vertex and Edge IS a Ref.
+This leads to a very complex inheritance hierarchy which adds unnecessary code complexity.
+
+=== Namespace ===
+A GraphProvider implements a Vertex- and EdgeProvider.
+This also means that theoratically a GraphProvider can contribute its Vertices to "namespace1" and its Edges to "namespace2".
+However the GraphProvider itself is selectable from the UI and may not generate a Graph which makes sense.
+It may be wise to have Vertex- and EdgeProvider only contribute to the same namespace. This means replace getVertexNamespace() and getEdgeNamespace() with getNamespace().
+
+=== GraphProvider ===
+At the moment the GraphProvider implements methods for loading and saving a Graph.
+This should not be part of the GraphProvider, as it seems to be part of the early implementations of the Topology Providers.
+However there exist a lot of code segments loading data from and saving data to disk.
+It may be reasonable to move the "persistence" of the graphs to another entity.
+There may be an instance to really "merge" graphs.
+This means that besides that a Graph was automatically created (e.g. linkd) and the layout automatically determined, a user may wish to permanently add new Vertices or even change the positions of the Vertices.
+This is supported by the current API but not fully and the API assumes a magic String.
+Persistence-Manager os something like that seem more reasonable, e.g. FileSystemTopologyPersister.
+
+=== Vertex/Edge ===
+Wrong model abstraction for Vertex and Edges.
+A Vertex and an Edge is generally only a Position or a connection on the Topology UI visible to the user.
+However depending on the selected GraphProvider each Vertex/Edge may be enriched with additional properties.
+Theses properties are very dependend on the selected GraphProvider.
+The general model supports having seperate Vertices and Edges for each GraphProvider, however the UI rendering does not support that.
+In addition to that the default Vertex/Edge definition may have to much logic in favor of the EnhancedLinkdTopologyProvider and may not be necessary in a general architecture.
+
+
+
 * Object instantiation dilemma (Session scope, Application Scope, etc.)
